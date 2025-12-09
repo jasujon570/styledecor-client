@@ -7,7 +7,6 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import axios from "axios";
 import jwtDecode from "jwt-decode";
 import useAxiosPublic from "../hooks/useAxiosPublic";
 
@@ -18,7 +17,6 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState(null);
   const axiosPublic = useAxiosPublic();
-  const serverBaseUrl = import.meta.env.VITE_SERVER_BASE_URL;
 
   const createUser = (email, password) => {
     setLoading(true);
@@ -52,7 +50,7 @@ const AuthProvider = ({ children }) => {
         const userInfo = { email: currentUser.email };
 
         axiosPublic
-          .post(`${serverBaseUrl}/auth/login`, userInfo)
+          .post(`/auth/login`, userInfo)
           .then((res) => {
             const token = res.data.token;
             if (token) {
@@ -77,7 +75,7 @@ const AuthProvider = ({ children }) => {
       setLoading(false);
     });
     return () => unsubscribe();
-  }, [axiosPublic, serverBaseUrl]);
+  }, [axiosPublic]);
 
   const authInfo = {
     user,
