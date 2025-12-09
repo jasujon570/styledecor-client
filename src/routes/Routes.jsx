@@ -1,5 +1,3 @@
-// client/src/routes/Routes.jsx (সম্পূর্ণ আপডেট)
-
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import Home from "../pages/Home/Home";
@@ -10,18 +8,17 @@ import Register from "../pages/Register/Register";
 import DashboardLayout from "../layouts/DashboardLayout";
 import PrivateRoute from "./PrivateRoute";
 
-const DashboardHome = () => (
-  <div className="text-xl">Welcome to Dashboard!</div>
-);
-const MyBookings = () => <div className="text-xl">My Bookings List</div>;
+import DashboardHome from "../pages/Dashboard/DashboardHome";
+import MyBookings from "../pages/Dashboard/MyBookings";
+import ManageServices from "../pages/Dashboard/ManageServices";
+import ManageUsers from "../pages/Dashboard/ManageUsers";
+
 const AssignedTasks = () => (
-  <div className="text-xl">Decorator Assigned Tasks</div>
+  <div className="p-6 bg-base-100 rounded-xl shadow-lg text-xl">
+    Decorator Assigned Tasks Page
+  </div>
 );
-const AdminHome = () => <div className="text-xl">Admin Overview</div>;
-const ManageServices = () => (
-  <div className="text-xl">Admin Manage Services</div>
-);
-const ManageUsers = () => <div className="text-xl">Admin Manage Users</div>;
+const AdminHome = () => <DashboardHome />;
 
 const router = createBrowserRouter([
   {
@@ -48,7 +45,6 @@ const router = createBrowserRouter([
         path: "/register",
         element: <Register />,
       },
-
       {
         path: "/contact",
         element: <div className="text-center py-20">Contact Page</div>,
