@@ -1,3 +1,5 @@
+// client/src/routes/Routes.jsx (সম্পূর্ণ আপডেট)
+
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import Home from "../pages/Home/Home";
@@ -8,11 +10,18 @@ import Register from "../pages/Register/Register";
 import DashboardLayout from "../layouts/DashboardLayout";
 import PrivateRoute from "./PrivateRoute";
 
-const Dashboard = () => <div>Dashboard Home</div>;
-const MyBookings = () => <div>My Bookings</div>;
-const AdminHome = () => <div>Admin Home</div>;
-const ManageServices = () => <div>Manage Services</div>;
-const ManageUsers = () => <div>Manage Users/Decorators</div>;
+const DashboardHome = () => (
+  <div className="text-xl">Welcome to Dashboard!</div>
+);
+const MyBookings = () => <div className="text-xl">My Bookings List</div>;
+const AssignedTasks = () => (
+  <div className="text-xl">Decorator Assigned Tasks</div>
+);
+const AdminHome = () => <div className="text-xl">Admin Overview</div>;
+const ManageServices = () => (
+  <div className="text-xl">Admin Manage Services</div>
+);
+const ManageUsers = () => <div className="text-xl">Admin Manage Users</div>;
 
 const router = createBrowserRouter([
   {
@@ -39,6 +48,11 @@ const router = createBrowserRouter([
         path: "/register",
         element: <Register />,
       },
+
+      {
+        path: "/contact",
+        element: <div className="text-center py-20">Contact Page</div>,
+      },
     ],
   },
   {
@@ -51,11 +65,16 @@ const router = createBrowserRouter([
     children: [
       {
         path: "home",
-        element: <Dashboard />,
+        element: <DashboardHome />,
       },
       {
         path: "my-bookings",
         element: <MyBookings />,
+      },
+
+      {
+        path: "assigned-tasks",
+        element: <AssignedTasks />,
       },
 
       {
