@@ -1,4 +1,7 @@
-import { createContext, useEffect, useState } from "react";
+import { AuthContext } from "./AuthContext";
+
+import { useEffect, useState } from "react";
+
 import auth from "../firebase/firebase.config";
 import {
   createUserWithEmailAndPassword,
@@ -7,10 +10,8 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import useAxiosPublic from "../hooks/useAxiosPublic";
-
-export const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);

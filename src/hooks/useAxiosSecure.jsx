@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../providers/AuthProvider";
+import { AuthContext } from "../providers/AuthContext";
 
 const axiosSecure = axios.create({
   baseURL: import.meta.env.VITE_SERVER_BASE_URL,
@@ -10,6 +10,7 @@ const axiosSecure = axios.create({
 const useAxiosSecure = () => {
   const navigate = useNavigate();
   const { logOut } = useContext(AuthContext);
+
 
   axiosSecure.interceptors.request.use(
     function (config) {
@@ -24,6 +25,7 @@ const useAxiosSecure = () => {
     }
   );
 
+
   axiosSecure.interceptors.response.use(
     function (response) {
       return response;
@@ -31,6 +33,7 @@ const useAxiosSecure = () => {
     async (error) => {
       const status = error.response.status;
 
+   
       if (status === 401 || status === 403) {
         await logOut();
         navigate("/login");
