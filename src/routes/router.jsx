@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
+import Home from "../pages/Home";
 
 export const router = createBrowserRouter([
   {
@@ -8,23 +9,39 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
+        element: <Home />,
+      },
+      {
+        path: "services",
         element: (
-          <div className="text-center mt-20 text-4xl font-bold">
-            Welcome to StyleDecor Home
+          <div className="p-20 text-center text-2xl">
+            Services Page (Coming Soon)
           </div>
         ),
       },
       {
-        path: "services",
-        element: <div>Services Page</div>,
-      },
-      {
         path: "about",
-        element: <div>About Us</div>,
+        element: (
+          <div className="p-20 text-center text-2xl">
+            About Us (Coming Soon)
+          </div>
+        ),
       },
       {
         path: "contact",
-        element: <div>Contact Page</div>,
+        element: (
+          <div className="p-20 text-center text-2xl">
+            Contact Page (Coming Soon)
+          </div>
+        ),
+      },
+      {
+        path: "login",
+        element: (
+          <div className="p-20 text-center text-2xl font-bold">
+            Login Page (Coming Soon)
+          </div>
+        ),
       },
     ],
   },
