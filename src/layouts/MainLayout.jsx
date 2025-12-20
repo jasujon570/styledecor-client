@@ -9,7 +9,7 @@ const MainLayout = () => {
         <Outlet />
       </div>
       <div className="p-10 bg-secondary text-white text-center mt-10">
-        Footer Section
+        Footer
       </div>
     </div>
   );
