@@ -7,25 +7,26 @@ import axios from "axios";
 
 const Home = () => {
   const [services, setServices] = useState([]);
+
   console.log("Motion library is active:", typeof motion);
+
   useEffect(() => {
     axios
       .get("http://localhost:5000/services")
       .then((res) => {
         setServices(res.data.slice(0, 6));
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("Error fetching services:", err));
   }, []);
 
   return (
     <div className="overflow-x-hidden">
-      <div className="relative min-h-[80vh] flex items-center justify-center bg-secondary overflow-hidden">
-        <div className="absolute -top-20 -left-20 w-72 h-72 bg-primary/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl"></div>
-
+   
+      <section className="relative min-h-[80vh] flex items-center justify-center bg-secondary overflow-hidden">
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center relative z-10 py-20">
+        
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
             className="md:w-1/2 text-white"
@@ -35,68 +36,51 @@ const Home = () => {
               <br />
               with StyleDecor
             </h1>
-            <p className="mt-6 text-lg text-gray-300 max-w-lg">
-              Premium home and ceremony decoration services tailored to your
-              unique taste. From intimate gatherings to grand celebrations, we
-              make it magical.
+            <p className="mt-6 text-lg text-gray-300 max-w-lg italic">
+              "Modern appointment management for local decoration companies."
             </p>
-            <div className="mt-10 flex gap-4">
+            <div className="mt-10">
               <Link
                 to="/services"
-                className="btn btn-primary px-8 rounded-full text-lg shadow-lg shadow-primary/30"
+                className="btn btn-primary px-8 rounded-full text-lg shadow-lg"
               >
                 Book Decoration Service
               </Link>
-              <button className="btn btn-outline text-white px-8 rounded-full border-2 hover:bg-white hover:text-secondary">
-                View Gallery
-              </button>
             </div>
           </motion.div>
 
+        
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="md:w-1/2 mt-12 md:mt-0 relative"
+            transition={{ duration: 1 }}
+            className="md:w-1/2 mt-12 md:mt-0"
           >
-            <div className="relative z-10 rounded-2xl overflow-hidden border-8 border-white/10 shadow-2xl">
+            <div className="rounded-2xl overflow-hidden border-8 border-white/10 shadow-2xl">
               <img
                 src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=2070&auto=format&fit=crop"
                 alt="Decoration"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-accent rounded-full -z-10 animate-pulse"></div>
           </motion.div>
         </div>
-      </div>
+      </section>
 
+      
       <section className="py-24 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-secondary">
+            <h2 className="text-4xl font-bold text-secondary uppercase tracking-widest">
               Our Popular Services
             </h2>
             <div className="w-24 h-1 bg-primary mx-auto mt-4"></div>
-            <p className="text-gray-500 mt-6 max-w-2xl mx-auto">
-              Experience the best-in-class decoration services for your home and
-              special events. Our expert decorators bring your dreams to life.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service) => (
               <ServiceCard key={service._id} service={service} />
             ))}
-          </div>
-
-          <div className="text-center mt-16">
-            <Link
-              to="/services"
-              className="btn btn-secondary px-10 rounded-full"
-            >
-              View All Services
-            </Link>
           </div>
         </div>
       </section>
