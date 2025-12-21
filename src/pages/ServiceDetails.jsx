@@ -1,10 +1,15 @@
-import { useLoaderData } from "react-router-dom";
+import { useContext } from "react";
+import { useLoaderData, useNavigate } from "react-router-dom";
+import { AuthContext } from "../providers/AuthProvider";
 import { motion } from "framer-motion";
-import { FaStar, FaMapMarkerAlt, FaClock } from "react-icons/fa";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { FaStar, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
 
 const ServiceDetails = () => {
   const service = useLoaderData();
   const {
+    _id,
     service_name,
     service_image,
     description,
@@ -12,8 +17,41 @@ const ServiceDetails = () => {
     unit,
     service_area,
     ratings,
-    duration,
   } = service;
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleBookService = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const date = form.date.value;
+    const instruction = form.instruction.value;
+
+    const booking = {
+      customerName: user?.displayName,
+      email: user?.email,
+      date,
+      instruction,
+      service_name,
+      service_id: _id,
+      service_image,
+      price: cost,
+      status: "pending",
+    };
+
+    axios
+      .post("http://localhost:5000/bookings", booking)
+      .then((res) => {
+        if (res.data.insertedId) {
+          toast.success("Service Booked Successfully!");
+          document.getElementById("booking_modal").close();
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("Something went wrong!");
+      });
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 py-16">
@@ -30,8 +68,9 @@ const ServiceDetails = () => {
               alt={service_name}
               className="w-full h-112.5 object-cover rounded-3xl transform hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute top-5 left-5 bg-primary/90 text-white px-4 py-2 rounded-full font-semibold shadow-lg">
-              {service_area}
+            <div className="absolute top-5 left-5 bg-primary/90 text-white px-4 py-2 rounded-full font-semibold shadow-lg flex items-center gap-2">
+              <FaMapMarkerAlt />
+              <span>{service_area}</span>
             </div>
           </motion.div>
 
@@ -54,12 +93,6 @@ const ServiceDetails = () => {
                   <FaMapMarkerAlt className="text-primary" />
                   <span>{service_area}</span>
                 </div>
-                {duration && (
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <FaClock className="text-primary" />
-                    <span>{duration}</span>
-                  </div>
-                )}
                 <div className="ml-auto flex items-center gap-1">
                   <FaStar className="text-yellow-500" />
                   <span className="font-bold text-secondary">{ratings}</span>
@@ -77,6 +110,9 @@ const ServiceDetails = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() =>
+                document.getElementById("booking_modal").showModal()
+              }
               className="btn btn-primary btn-lg rounded-full text-white shadow-2xl py-4 px-8 font-semibold text-xl transition-transform"
             >
               Book This Service Now
@@ -84,18 +120,73 @@ const ServiceDetails = () => {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mt-16"
+        <dialog
+          id="booking_modal"
+          className="modal modal-bottom sm:modal-middle"
         >
-          <h2 className="text-3xl font-bold text-secondary mb-6">
-            You Might Also Like
-          </h2>
+          <div className="modal-box rounded-2xl p-8 bg-white shadow-2xl">
+            <h3 className="font-bold text-2xl text-secondary mb-2">
+              Confirm Booking: {service_name}
+            </h3>
+            <p className="text-gray-500 mb-6">
+              Service Price:{" "}
+              <span className="font-semibold text-primary">${cost}</span>
+            </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-        </motion.div>
+            <form
+              onSubmit={handleBookService}
+              method="dialog"
+              className="space-y-4"
+            >
+              <input
+                type="text"
+                defaultValue={user?.displayName}
+                readOnly
+                className="input input-bordered w-full bg-gray-100"
+                placeholder="Name"
+              />
+
+              <input
+                type="email"
+                defaultValue={user?.email}
+                readOnly
+                className="input input-bordered w-full bg-gray-100"
+                placeholder="Email"
+              />
+
+              <div className="flex items-center gap-2">
+                <FaCalendarAlt className="text-primary text-lg" />
+                <input
+                  type="date"
+                  name="date"
+                  className="input input-bordered w-full"
+                  required
+                />
+              </div>
+
+              <textarea
+                name="instruction"
+                className="textarea textarea-bordered w-full h-24"
+                placeholder="Address House 15, Road 3, Block B, Uttara, Dhaka"
+              ></textarea>
+
+              <div className="modal-action flex justify-end gap-3">
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() =>
+                    document.getElementById("booking_modal").close()
+                  }
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary text-white">
+                  Confirm Booking
+                </button>
+              </div>
+            </form>
+          </div>
+        </dialog>
       </div>
     </div>
   );
