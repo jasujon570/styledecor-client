@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
-// Environment variables theke data neya hocche safety er jonno
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_apiKey,
   authDomain: import.meta.env.VITE_authDomain,
@@ -11,8 +10,8 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_appId,
 };
 
-// Initialize Firebase
+
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Auth and export it
+
 export const auth = getAuth(app);
