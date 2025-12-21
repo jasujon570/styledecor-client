@@ -9,6 +9,7 @@ import PrivateRoute from "./PrivateRoute";
 import MyBookings from "../pages/MyBookings";
 import AddService from "../pages/AddService";
 import ManageServices from "../pages/ManageServices";
+import UpdateService from "../pages/UpdateService";
 
 export const router = createBrowserRouter([
   {
@@ -28,6 +29,16 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <ServiceDetails />
+          </PrivateRoute>
+        ),
+        loader: ({ params }) =>
+          fetch(`http://localhost:5000/service/${params.id}`),
+      },
+      {
+        path: "update-service/:id",
+        element: (
+          <PrivateRoute>
+            <UpdateService />
           </PrivateRoute>
         ),
         loader: ({ params }) =>
