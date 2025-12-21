@@ -167,7 +167,7 @@ const ServiceDetails = () => {
               <textarea
                 name="instruction"
                 className="textarea textarea-bordered w-full h-24"
-                placeholder="Address House 15, Road 3, Block B, Uttara, Dhaka"
+                placeholder="e.g. House 15, Road 3, Block B, Uttara, Dhaka"
               ></textarea>
 
               <div className="modal-action flex justify-end gap-3">

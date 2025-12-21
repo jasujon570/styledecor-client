@@ -36,10 +36,34 @@ const Navbar = () => {
       {user && (
         <>
           <li>
-            <NavLink to="/bookings">My Bookings</NavLink>
+            <NavLink
+              to="/bookings"
+              className={({ isActive }) =>
+                isActive ? "text-primary font-bold" : ""
+              }
+            >
+              My Bookings
+            </NavLink>
           </li>
           <li>
-            <NavLink to="/add-service">Add Service</NavLink>
+            <NavLink
+              to="/add-service"
+              className={({ isActive }) =>
+                isActive ? "text-primary font-bold" : ""
+              }
+            >
+              Add Service
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/manage-services"
+              className={({ isActive }) =>
+                isActive ? "text-primary font-bold" : ""
+              }
+            >
+              Manage Services
+            </NavLink>
           </li>
         </>
       )}

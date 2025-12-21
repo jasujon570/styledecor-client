@@ -51,7 +51,7 @@ const AddService = () => {
           onSubmit={handleAddService}
           className="grid grid-cols-1 md:grid-cols-2 gap-8"
         >
-          {/* Service Name */}
+          
           <div className="form-control">
             <label className="label font-semibold text-lg">Service Name</label>
             <input
@@ -63,7 +63,7 @@ const AddService = () => {
             />
           </div>
 
-          {/* Service Image */}
+        
           <div className="form-control">
             <label className="label font-semibold text-lg">
               Service Image URL
@@ -77,7 +77,7 @@ const AddService = () => {
             />
           </div>
 
-          {/* Category */}
+          
           <div className="form-control">
             <label className="label font-semibold text-lg">Category</label>
             <select
@@ -92,7 +92,7 @@ const AddService = () => {
             </select>
           </div>
 
-          {/* Cost */}
+         
           <div className="form-control">
             <label className="label font-semibold text-lg">Cost</label>
             <input
@@ -104,7 +104,7 @@ const AddService = () => {
             />
           </div>
 
-          {/* Unit */}
+          
           <div className="form-control">
             <label className="label font-semibold text-lg">Unit</label>
             <input
@@ -116,7 +116,7 @@ const AddService = () => {
             />
           </div>
 
-          {/* Service Area */}
+          
           <div className="form-control">
             <label className="label font-semibold text-lg">Service Area</label>
             <input
@@ -128,7 +128,7 @@ const AddService = () => {
             />
           </div>
 
-          {/* Description */}
+        
           <div className="form-control md:col-span-2">
             <label className="label font-semibold text-lg">Description</label>
             <textarea
@@ -139,7 +139,7 @@ const AddService = () => {
             ></textarea>
           </div>
 
-          {/* Submit Button */}
+        
           <button className="btn btn-primary w-full md:col-span-2 rounded-full text-white text-lg font-semibold hover:scale-105 transition-transform shadow-lg">
             Add Service
           </button>

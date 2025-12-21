@@ -81,7 +81,6 @@ const MyBookings = () => {
                   key={booking._id}
                   className="hover:bg-gray-50 transition-colors"
                 >
-                  {/* Service */}
                   <td>
                     <div className="flex items-center space-x-3">
                       <div className="avatar">
@@ -100,17 +99,14 @@ const MyBookings = () => {
                     </div>
                   </td>
 
-                  {/* Date */}
                   <td className="text-gray-600 text-lg md:text-xl">
                     {booking.date}
                   </td>
 
-                  {/* Price */}
                   <td className="font-bold text-primary text-lg md:text-xl">
                     ${booking.price}
                   </td>
 
-                  {/* Status */}
                   <td>
                     <span
                       className={`inline-block px-4 py-2 rounded-full text-center font-semibold text-sm md:text-base ${
@@ -125,7 +121,6 @@ const MyBookings = () => {
                     </span>
                   </td>
 
-                  {/* Action */}
                   <td>
                     <button
                       onClick={() => handleDelete(booking._id)}
