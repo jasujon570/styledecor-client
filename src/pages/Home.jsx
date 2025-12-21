@@ -7,19 +7,29 @@ import axios from "axios";
 
 const Home = () => {
   const [services, setServices] = useState([]);
-  console.log("Motion library is active:", typeof motion);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/services")
-      .then((res) => {
-        setServices(res.data.slice(0, 6));
-      })
-      .catch((err) => console.error(err));
+    const fetchServices = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/services");
+        setServices(response.data.slice(0, 6));
+        setError(null);
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError("Failed to fetch services. Please ensure backend is running.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
   }, []);
 
   return (
     <div className="overflow-x-hidden">
-      <div className="relative min-h-[80vh] flex items-center justify-center bg-secondary overflow-hidden">
+      <section className="relative min-h-[80vh] flex items-center justify-center bg-secondary overflow-hidden">
         <div className="absolute -top-20 -left-20 w-72 h-72 bg-primary/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl"></div>
 
@@ -37,19 +47,15 @@ const Home = () => {
             </h1>
             <p className="mt-6 text-lg text-gray-300 max-w-lg">
               Premium home and ceremony decoration services tailored to your
-              unique taste. From intimate gatherings to grand celebrations, we
-              make it magical.
+              unique taste.
             </p>
-            <div className="mt-10 flex gap-4">
+            <div className="mt-10">
               <Link
                 to="/services"
-                className="btn btn-primary px-8 rounded-full text-lg shadow-lg shadow-primary/30"
+                className="btn btn-primary px-8 rounded-full text-lg shadow-lg"
               >
                 Book Decoration Service
               </Link>
-              <button className="btn btn-outline text-white px-8 rounded-full border-2 hover:bg-white hover:text-secondary">
-                View Gallery
-              </button>
             </div>
           </motion.div>
 
@@ -66,10 +72,9 @@ const Home = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-accent rounded-full -z-10 animate-pulse"></div>
           </motion.div>
         </div>
-      </div>
+      </section>
 
       <section className="py-24 bg-white">
         <div className="container mx-auto px-6">
@@ -78,26 +83,41 @@ const Home = () => {
               Our Popular Services
             </h2>
             <div className="w-24 h-1 bg-primary mx-auto mt-4"></div>
-            <p className="text-gray-500 mt-6 max-w-2xl mx-auto">
-              Experience the best-in-class decoration services for your home and
-              special events. Our expert decorators bring your dreams to life.
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service) => (
-              <ServiceCard key={service._id} service={service} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <span className="loading loading-spinner loading-lg text-primary"></span>
+              <p className="mt-4 text-gray-500 italic">Loading services...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20">
+              <p className="text-red-500 font-semibold">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="btn btn-outline btn-sm mt-4"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {services.map((service) => (
+                <ServiceCard key={service._id} service={service} />
+              ))}
+            </div>
+          )}
 
-          <div className="text-center mt-16">
-            <Link
-              to="/services"
-              className="btn btn-secondary px-10 rounded-full"
-            >
-              View All Services
-            </Link>
-          </div>
+          {!loading && !error && (
+            <div className="text-center mt-16">
+              <Link
+                to="/services"
+                className="btn btn-secondary px-10 rounded-full"
+              >
+                View All Services
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
