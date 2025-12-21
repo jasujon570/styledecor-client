@@ -1,15 +1,23 @@
+import { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { AuthContext } from "../providers/AuthProvider";
 
 const Navbar = () => {
+  const { user, logOut } = useContext(AuthContext);
+
+  const handleLogOut = () => {
+    logOut()
+      .then(() => {})
+      .catch((error) => console.error(error));
+  };
+
   const navLinks = (
     <>
       <li>
         <NavLink
           to="/"
           className={({ isActive }) =>
-            isActive
-              ? "text-primary font-bold border-b-2 border-primary"
-              : "hover:text-primary"
+            isActive ? "text-primary font-bold" : ""
           }
         >
           Home
@@ -19,46 +27,30 @@ const Navbar = () => {
         <NavLink
           to="/services"
           className={({ isActive }) =>
-            isActive
-              ? "text-primary font-bold border-b-2 border-primary"
-              : "hover:text-primary"
+            isActive ? "text-primary font-bold" : ""
           }
         >
           Services
         </NavLink>
       </li>
-      <li>
-        <NavLink
-          to="/about"
-          className={({ isActive }) =>
-            isActive
-              ? "text-primary font-bold border-b-2 border-primary"
-              : "hover:text-primary"
-          }
-        >
-          About
-        </NavLink>
-      </li>
-      <li>
-        <NavLink
-          to="/contact"
-          className={({ isActive }) =>
-            isActive
-              ? "text-primary font-bold border-b-2 border-primary"
-              : "hover:text-primary"
-          }
-        >
-          Contact
-        </NavLink>
-      </li>
+      {user && (
+        <>
+          <li>
+            <NavLink to="/bookings">My Bookings</NavLink>
+          </li>
+          <li>
+            <NavLink to="/add-service">Add Service</NavLink>
+          </li>
+        </>
+      )}
     </>
   );
 
   return (
-    <div className="navbar bg-base-100/80 backdrop-blur-md sticky top-0 z-50 px-4 md:px-8 border-b border-base-200">
+    <div className="navbar bg-base-100 shadow-sm px-4 md:px-8 sticky top-0 z-50">
       <div className="navbar-start">
         <div className="dropdown">
-          <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
+          <label tabIndex={0} className="btn btn-ghost lg:hidden">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -73,7 +65,7 @@ const Navbar = () => {
                 d="M4 6h16M4 12h8m-8 6h16"
               />
             </svg>
-          </div>
+          </label>
           <ul
             tabIndex={0}
             className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52"
@@ -81,25 +73,55 @@ const Navbar = () => {
             {navLinks}
           </ul>
         </div>
-        <Link
-          to="/"
-          className="text-2xl font-extrabold tracking-tighter flex items-center gap-2"
-        >
+        <Link to="/" className="text-2xl font-bold text-secondary">
           <span className="text-primary">Style</span>Decor
         </Link>
       </div>
       <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal px-1 gap-6 font-medium">
+        <ul className="menu menu-horizontal px-1 gap-2 font-medium">
           {navLinks}
         </ul>
       </div>
-      <div className="navbar-end gap-2">
-        <Link
-          to="/login"
-          className="btn btn-primary btn-sm md:btn-md rounded-full px-6"
-        >
-          Login
-        </Link>
+      <div className="navbar-end">
+        {user ? (
+          <div className="dropdown dropdown-end flex items-center gap-3">
+            <div className="hidden md:block text-right">
+              <p className="text-sm font-bold">{user?.displayName}</p>
+            </div>
+            <label
+              tabIndex={0}
+              className="btn btn-ghost btn-circle avatar border-2 border-primary"
+            >
+              <div className="w-10 rounded-full">
+                <img
+                  referrerPolicy="no-referrer"
+                  src={
+                    user?.photoURL ||
+                    "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                  }
+                  alt="profile"
+                />
+              </div>
+            </label>
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              <li>
+                <button
+                  onClick={handleLogOut}
+                  className="text-red-500 font-bold"
+                >
+                  Logout
+                </button>
+              </li>
+            </ul>
+          </div>
+        ) : (
+          <Link to="/login" className="btn btn-primary rounded-full px-8">
+            Login
+          </Link>
+        )}
       </div>
     </div>
   );

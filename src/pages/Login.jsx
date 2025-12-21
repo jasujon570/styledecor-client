@@ -41,14 +41,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-base-200 to-secondary/10 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-primary/10 via-base-200 to-secondary/10 px-4">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="w-full max-w-md backdrop-blur-xl bg-white/80 border border-gray-200 shadow-2xl rounded-3xl p-8"
       >
-        {/* Header */}
         <div className="text-center mb-8">
           <h2 className="text-3xl font-extrabold text-secondary">
             Welcome Back 👋
@@ -59,7 +58,6 @@ const Login = () => {
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
             <label className="text-sm font-medium text-gray-600">
@@ -102,10 +100,8 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Divider */}
         <div className="divider text-xs text-gray-400 my-6">OR</div>
 
-        {/* Google */}
         <button
           onClick={handleGoogleSignIn}
           className="btn btn-outline w-full rounded-full flex items-center justify-center gap-3 hover:bg-gray-100 transition"
@@ -114,7 +110,6 @@ const Login = () => {
           <span className="font-medium">Continue with Google</span>
         </button>
 
-        {/* Footer */}
         <p className="text-center mt-8 text-sm text-gray-600">
           New here?{" "}
           <Link

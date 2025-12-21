@@ -17,7 +17,7 @@ const ServiceCard = ({ service }) => {
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent"></div>
 
         <span className="absolute bottom-4 left-4 bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold shadow">
           ৳ {cost} <span className="text-xs opacity-90">/{unit}</span>
