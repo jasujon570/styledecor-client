@@ -32,7 +32,7 @@ const RevenueMonitoring = () => {
     if (existing) {
       existing.bookings += 1;
     } else {
-      acc.push({ name: booking.serviceName, bookings: 1 });
+      acc.push({ name: booking.serviceName || "Unknown", bookings: 1 });
     }
     return acc;
   }, []);
@@ -44,53 +44,67 @@ const RevenueMonitoring = () => {
   const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
   return (
-    <section className="p-4 md:p-8 min-h-screen">
+    <section className="p-4 md:p-8 min-h-screen bg-gray-50">
       <h2 className="text-3xl font-bold text-secondary mb-8 flex items-center gap-2">
         <FaChartBar /> Revenue & Analytics
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        <div className="stat bg-white shadow-xl rounded-2xl border-l-8 border-primary">
+        <div className="stat bg-white shadow-xl rounded-2xl border-l-8 border-primary p-6">
           <div className="stat-figure text-primary text-3xl">
             <FaWallet />
           </div>
-          <div className="stat-title font-bold text-gray-500">
+          <div className="stat-title font-bold text-gray-500 uppercase text-xs">
             Total Revenue (Paid)
           </div>
-          <div className="stat-value text-primary text-2xl">
+          <div className="stat-value text-primary text-2xl font-black">
             {totalRevenue.toLocaleString()} BDT
           </div>
         </div>
 
-        <div className="stat bg-white shadow-xl rounded-2xl border-l-8 border-secondary">
+        <div className="stat bg-white shadow-xl rounded-2xl border-l-8 border-secondary p-6">
           <div className="stat-figure text-secondary text-3xl">
             <FaChartBar />
           </div>
-          <div className="stat-title font-bold text-gray-500">
+          <div className="stat-title font-bold text-gray-500 uppercase text-xs">
             Total Bookings
           </div>
-          <div className="stat-value text-secondary text-2xl">
+          <div className="stat-value text-secondary text-2xl font-black">
             {allBookings.length}
           </div>
         </div>
       </div>
 
       <div className="bg-white p-6 rounded-2xl shadow-xl border">
-        <h3 className="text-xl font-bold mb-6 text-center text-gray-600 italic">
-          Service Demand Chart (Number of services booked)
+        <h3 className="text-xl font-bold mb-8 text-center text-gray-700">
+          Service Demand Chart
         </h3>
-        <div className="h-100 w-full">
+
+        <div className="w-full h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+            >
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 12 }}
+                angle={-45}
+                textAnchor="end"
+                interval={0}
+              />
               <YAxis />
               <Tooltip cursor={{ fill: "#f3f4f6" }} />
-              <Legend />
+              <Legend
+                verticalAlign="top"
+                wrapperStyle={{ paddingBottom: "20px" }}
+              />
               <Bar
                 dataKey="bookings"
                 name="Number of Bookings"
                 radius={[10, 10, 0, 0]}
+                barSize={60}
               >
                 {chartData.map((entry, index) => (
                   <Cell
