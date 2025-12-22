@@ -2,6 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
+import { FaGoogle } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const Login = () => {
   const { signIn, googleSignIn } = useAuth();
@@ -25,14 +27,13 @@ const Login = () => {
       })
       .catch((error) => {
         let errorMessage = "Invalid email or password.";
-        if (error.code === "auth/wrong-password") {
+        if (error.code === "auth/wrong-password")
           errorMessage = "Incorrect password.";
-        } else if (
+        else if (
           error.code === "auth/user-not-found" ||
           error.code === "auth/invalid-email"
-        ) {
+        )
           errorMessage = "User not found or invalid credentials.";
-        }
         toast.error(errorMessage, { id: toastId });
       });
   };
@@ -47,82 +48,89 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-base-200">
-      <div className="hidden lg:flex flex-col justify-center px-16 bg-linear-to-br from-primary to-secondary text-primary-content">
-        <h1 className="text-5xl font-extrabold mb-6">Welcome Back</h1>
-        <p className="text-lg max-w-md leading-relaxed">
-          Login to manage your smart home and ceremony decoration bookings with
-          StyleDecor.
-        </p>
-      </div>
-
-      <div className="flex items-center justify-center px-4">
-        <div className="card w-full max-w-md bg-base-100 shadow-2xl rounded-2xl">
-          <div className="card-body">
-            <h2 className="text-3xl font-bold text-center mb-2">Login</h2>
-            <p className="text-center text-sm opacity-70 mb-6">
-              Access your StyleDecor account
-            </p>
-
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <label className="label">Email</label>
-                <input
-                  type="email"
-                  placeholder="example@email.com"
-                  className="input input-bordered w-full"
-                  {...register("email", { required: "Email is required" })}
-                />
-                {errors.email && (
-                  <p className="text-error text-sm mt-1">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="label">Password</label>
-                <input
-                  type="password"
-                  placeholder="Your password"
-                  className="input input-bordered w-full"
-                  {...register("password", {
-                    required: "Password is required",
-                  })}
-                />
-                {errors.password && (
-                  <p className="text-error text-sm mt-1">
-                    {errors.password.message}
-                  </p>
-                )}
-                <div className="text-right mt-1">
-                  <a className="link link-hover text-sm">Forgot password?</a>
-                </div>
-              </div>
-
-              <button type="submit" className="btn btn-primary w-full mt-4">
-                Login
-              </button>
-            </form>
-
-            <div className="divider">OR</div>
-
-            <button
-              onClick={handleGoogleSignIn}
-              className="btn btn-outline btn-info w-full"
-            >
-              Continue with Google
-            </button>
-
-            <p className="text-center text-sm mt-6">
-              New to StyleDecor?{" "}
-              <Link to="/register" className="link link-primary font-medium">
-                Create an account
-              </Link>
-            </p>
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-primary/10 via-base-200 to-secondary/10 px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-full max-w-md backdrop-blur-xl bg-white/80 border border-gray-200 shadow-2xl rounded-3xl p-8"
+      >
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-extrabold text-secondary">Login</h2>
+          <p className="text-sm text-gray-500 mt-2">
+            Access your <span className="font-semibold">StyleDecor</span>{" "}
+            account
+          </p>
         </div>
-      </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <div>
+            <label className="text-sm font-medium text-gray-600">Email</label>
+            <input
+              type="email"
+              placeholder="example@email.com"
+              className="input input-bordered w-full mt-1 focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
+              {...register("email", { required: "Email is required" })}
+            />
+            {errors.email && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              className="input input-bordered w-full mt-1 focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
+              {...register("password", { required: "Password is required" })}
+            />
+            {errors.password && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors.password.message}
+              </p>
+            )}
+            <div className="text-right mt-1">
+              <a className="link link-hover text-sm text-primary/80">
+                Forgot password?
+              </a>
+            </div>
+          </div>
+
+          <button className="btn btn-primary w-full mt-2 rounded-full text-white text-base font-semibold hover:scale-[1.02] transition-transform">
+            Login
+          </button>
+        </form>
+
+        {/* Divider */}
+        <div className="divider text-xs text-gray-400 my-6">OR</div>
+
+        {/* Google */}
+        <button
+          onClick={handleGoogleSignIn}
+          className="btn btn-outline w-full rounded-full flex items-center justify-center gap-3 hover:bg-gray-100 transition"
+        >
+          <FaGoogle className="text-lg text-red-500" />
+          <span className="font-medium">Continue with Google</span>
+        </button>
+
+        {/* Footer */}
+        <p className="text-center mt-8 text-sm text-gray-600">
+          New to StyleDecor?{" "}
+          <Link
+            to="/register"
+            className="text-primary font-semibold hover:underline"
+          >
+            Create an account
+          </Link>
+        </p>
+      </motion.div>
     </div>
   );
 };
