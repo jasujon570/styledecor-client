@@ -1,174 +1,122 @@
-import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import LoadingSpinner from "../../../Shared/LoadingSpinner";
-import {
-  FaUsers,
-  FaCheckCircle,
-  FaTools,
-  FaTimesCircle,
-  FaUserPlus,
-} from "react-icons/fa";
 import toast from "react-hot-toast";
+import { FaTasks, FaUserCheck } from "react-icons/fa";
 
 const ManageBookings = () => {
   const axiosSecure = useAxiosSecure();
 
-
   const {
-    data: allBookings = [],
-    isLoading: bookingLoading,
+    data: bookings = [],
+    isLoading: bLoading,
     refetch,
   } = useQuery({
     queryKey: ["allBookings"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/bookings");
+      const res = await axiosSecure.get("/bookings/all");
       return res.data;
     },
   });
 
- 
   const { data: decorators = [] } = useQuery({
-    queryKey: ["all-decorators"],
+    queryKey: ["allDecorators"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/users/decorators");
-      return res.data;
+      const res = await axiosSecure.get("/users");
+      return res.data.filter((user) => user.role === "decorator");
     },
   });
 
-
-  const handleUpdateStatus = async (bookingId, newStatus) => {
+  const handleAssign = async (bookingId, decorator) => {
     try {
-      const res = await axiosSecure.patch(`/bookings/status/${bookingId}`, {
-        status: newStatus,
-      });
+      const res = await axiosSecure.patch(
+        `/bookings/assign-decorator/${bookingId}`,
+        {
+          decoratorEmail: decorator.email,
+          decoratorName: decorator.displayName || decorator.name,
+        }
+      );
       if (res.data.modifiedCount > 0) {
-        toast.success(`Booking status updated to ${newStatus}.`);
+        toast.success("Decorator Assigned Successfully!");
         refetch();
       }
     } catch (error) {
-      toast.error("Could not update status.");
+      toast.error("Assignment Failed!");
     }
   };
 
-
-  const handleAssign = async (bookingId, decoratorEmail) => {
-    if (!decoratorEmail) return;
-    try {
-      const res = await axiosSecure.patch(`/bookings/assign/${bookingId}`, {
-        decoratorEmail,
-        status: "Assigned",
-      });
-      if (res.data.modifiedCount > 0) {
-        toast.success("Decorator assigned successfully!");
-        refetch();
-      }
-    } catch (error) {
-      toast.error("Failed to assign decorator.");
-    }
-  };
-
-  if (bookingLoading) return <LoadingSpinner />;
+  if (bLoading) return <LoadingSpinner />;
 
   return (
-    <section className="p-4 md:p-8">
-      <h2 className="text-3xl font-bold text-error mb-8 flex items-center gap-2">
-        <FaTools /> Manage All Bookings ({allBookings.length})
+    <div className="p-8">
+      <h2 className="text-3xl font-bold mb-8 flex items-center gap-2">
+        <FaTasks /> Manage All Bookings
       </h2>
-
-      <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
+      <div className="overflow-x-auto bg-white rounded-lg shadow-xl">
         <table className="table w-full">
-          <thead className="bg-red-100 text-error">
-            <tr>
+          <thead>
+            <tr className="bg-gray-100">
               <th>Service</th>
-              <th>Client</th>
+              <th>Customer</th>
               <th>Payment</th>
               <th>Assign Decorator</th>
               <th>Status</th>
-              <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {allBookings.map((booking) => (
+            {bookings.map((booking) => (
               <tr key={booking._id}>
-                <td className="font-semibold">{booking.serviceName}</td>
-                <td>
-                  {booking.bookerName} <br />{" "}
-                  <span className="text-xs text-gray-400">
-                    {booking.bookerEmail}
-                  </span>
-                </td>
-
-              
+                <td>{booking.serviceName}</td>
+                <td>{booking.userEmail}</td>
                 <td>
                   <span
                     className={`badge ${
                       booking.paymentStatus === "paid"
                         ? "badge-success"
-                        : "badge-error"
-                    } text-white`}
+                        : "badge-error text-white"
+                    }`}
                   >
-                    {booking.paymentStatus === "paid" ? "Paid" : "Unpaid"}
+                    {booking.paymentStatus || "unpaid"}
                   </span>
                 </td>
-
-              
                 <td>
                   {booking.paymentStatus === "paid" ? (
                     <select
-                      className="select select-bordered select-xs w-full max-w-xs"
-                      onChange={(e) =>
-                        handleAssign(booking._id, e.target.value)
-                      }
                       defaultValue={booking.decoratorEmail || ""}
+                      onChange={(e) => {
+                        const selected = decorators.find(
+                          (d) => d.email === e.target.value
+                        );
+                        handleAssign(booking._id, selected);
+                      }}
+                      className="select select-bordered select-xs w-full max-w-xs"
                     >
                       <option value="" disabled>
                         Select Decorator
                       </option>
-                      {decorators.map((dec) => (
-                        <option key={dec._id} value={dec.email}>
-                          {dec.name}
+                      {decorators.map((d) => (
+                        <option key={d._id} value={d.email}>
+                          {d.displayName || d.name}
                         </option>
                       ))}
                     </select>
                   ) : (
-                    <span className="text-xs text-gray-400 italic">
-                      Wait for payment
+                    <span className="text-xs italic text-gray-400">
+                      Wait for Payment
                     </span>
                   )}
                 </td>
-
                 <td>
-                  <span
-                    className={`badge ${
-                      booking.status === "Assigned"
-                        ? "badge-info"
-                        : "badge-neutral"
-                    }`}
-                  >
-                    {booking.status}
+                  <span className="badge badge-outline">
+                    {booking.status || "pending"}
                   </span>
-                </td>
-
-                <td>
-                  <div className="flex gap-2">
-                    {booking.status !== "Cancelled" && (
-                      <button
-                        onClick={() =>
-                          handleUpdateStatus(booking._id, "Cancelled")
-                        }
-                        className="btn btn-error btn-xs text-white"
-                      >
-                        <FaTimesCircle /> Cancel
-                      </button>
-                    )}
-                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
   );
 };
 
