@@ -1,7 +1,7 @@
-import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import LoadingSpinner from "../../../Shared/LoadingSpinner";
-import { FaUserShield, FaUserPlus, FaUserTie } from "react-icons/fa";
+import { FaUserShield, FaUserEdit, FaUsers } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 const ManageDecorators = () => {
@@ -15,87 +15,58 @@ const ManageDecorators = () => {
     queryKey: ["allUsers"],
     queryFn: async () => {
       const res = await axiosSecure.get("/users");
-      return res.data;
+
+      return Array.isArray(res.data) ? res.data : [];
     },
   });
 
   const handleUpdateRole = async (user, newRole) => {
     try {
-      const res = await axiosSecure.patch(`/users/role/${user._id}`, {
+      const res = await axiosSecure.patch(`/users/update-role/${user._id}`, {
         role: newRole,
       });
       if (res.data.modifiedCount > 0) {
-        toast.success(
-          `${user.name || user.email}'s role updated to ${newRole}.`
-        );
+        toast.success(`${user.displayName} is now a ${newRole}!`);
         refetch();
       }
     } catch (error) {
-      toast.error("Could not update user role.");
+      toast.error("Failed to update role.");
     }
   };
 
   if (isLoading) return <LoadingSpinner />;
 
   return (
-    <section className="p-4 md:p-8">
-      <h2 className="text-3xl font-bold text-primary mb-8 flex items-center gap-2">
-        <FaUserTie /> Manage Users & Decorators ({users.length})
+    <div className="p-4 md:p-8">
+      <h2 className="text-3xl font-bold mb-8 flex items-center gap-2 text-primary">
+        <FaUsers /> Manage Users & Decorators ({users.length})
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="stats shadow bg-blue-100 text-blue-800">
-          <div className="stat">
-            <div className="stat-title text-blue-600 font-bold">
-              Total Users
-            </div>
-            <div className="stat-value text-2xl">{users.length}</div>
-          </div>
-        </div>
-        <div className="stats shadow bg-green-100 text-green-800">
-          <div className="stat">
-            <div className="stat-title text-green-600 font-bold">
-              Decorators
-            </div>
-            <div className="stat-value text-2xl">
-              {users.filter((u) => u.role === "decorator").length}
-            </div>
-          </div>
-        </div>
-        <div className="stats shadow bg-red-100 text-red-800">
-          <div className="stat">
-            <div className="stat-title text-red-600 font-bold">Admins</div>
-            <div className="stat-value text-2xl">
-              {users.filter((u) => u.role === "admin").length}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
+      <div className="overflow-x-auto bg-white rounded-lg shadow-xl">
         <table className="table w-full">
-          <thead className="bg-base-200">
-            <tr>
-              <th>User Info</th>
+          <thead>
+            <tr className="bg-gray-100">
+              <th>#</th>
+              <th>Name</th>
+              <th>Email</th>
               <th>Current Role</th>
-              <th>Actions</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {users.map((user, index) => (
               <tr key={user._id}>
-                <td>
-                  <div className="font-bold">{user.name || "N/A"}</div>
-                  <div className="text-sm opacity-50">{user.email}</div>
-                </td>
+                <th>{index + 1}</th>
+                <td>{user.displayName || user.name}</td>
+                <td>{user.email}</td>
                 <td>
                   <span
-                    className={`badge badge-md capitalize ${
+                    className={`badge ${
                       user.role === "admin"
-                        ? "badge-error"
+                        ? "badge-secondary"
                         : user.role === "decorator"
-                        ? "badge-success"
-                        : "badge-neutral"
+                        ? "badge-accent"
+                        : "badge-ghost"
                     }`}
                   >
                     {user.role || "user"}
@@ -105,17 +76,19 @@ const ManageDecorators = () => {
                   {user.role !== "admin" && (
                     <button
                       onClick={() => handleUpdateRole(user, "admin")}
-                      className="btn btn-error btn-xs text-white"
+                      className="btn btn-xs btn-outline btn-secondary"
+                      title="Make Admin"
                     >
-                      <FaUserShield /> Make Admin
+                      <FaUserShield /> Admin
                     </button>
                   )}
                   {user.role !== "decorator" && (
                     <button
                       onClick={() => handleUpdateRole(user, "decorator")}
-                      className="btn btn-success btn-xs text-white"
+                      className="btn btn-xs btn-outline btn-accent"
+                      title="Make Decorator"
                     >
-                      <FaUserPlus /> Make Decorator
+                      <FaUserEdit /> Decorator
                     </button>
                   )}
                 </td>
@@ -124,7 +97,7 @@ const ManageDecorators = () => {
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
   );
 };
 

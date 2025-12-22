@@ -17,16 +17,17 @@ const ManageServices = () => {
     queryKey: ["allServicesAdmin"],
     queryFn: async () => {
       const res = await axiosSecure.get("/services");
-      return Array.isArray(res.data) ? res.data : res.data.services || [];
+      return Array.isArray(res.data) ? res.data : [];
     },
   });
 
   const handleAddService = async (e) => {
     e.preventDefault();
     const form = e.target;
+
     const newService = {
       service_name: form.service_name.value,
-      cost: parseFloat(form.cost.value),
+      cost: Number(form.cost.value),
       unit: form.unit.value,
       service_category: form.service_category.value,
       description: form.description.value,
@@ -43,16 +44,18 @@ const ManageServices = () => {
         refetch();
       }
     } catch (error) {
-      toast.error("Failed to add service.");
+      console.error(error);
+      toast.error(
+        error.response?.data?.message || "Check your data and try again."
+      );
     }
   };
 
   const handleDeleteService = async (id) => {
     if (!window.confirm("Are you sure?")) return;
     try {
-      const res = await axiosSecure.get(`/services/${id}`);
-      const deleteRes = await axiosSecure.delete(`/services/${id}`);
-      if (deleteRes.data.deletedCount > 0) {
+      const res = await axiosSecure.delete(`/services/${id}`);
+      if (res.data.deletedCount > 0) {
         toast.success("Service deleted.");
         refetch();
       }
@@ -67,8 +70,7 @@ const ManageServices = () => {
     <section className="p-4 md:p-8">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-bold text-error flex items-center gap-2">
-          <FaTools /> Manage Services (
-          {Array.isArray(services) ? services.length : 0})
+          <FaTools /> Manage Services ({services.length})
         </h2>
         <button
           className="btn btn-primary"
@@ -82,7 +84,6 @@ const ManageServices = () => {
 
       <dialog id="add_service_modal" className="modal">
         <div className="modal-box w-11/12 max-w-2xl">
-          <h3 className="font-bold text-lg mb-4">Add New Decoration Service</h3>
           <form
             onSubmit={handleAddService}
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
@@ -91,50 +92,48 @@ const ManageServices = () => {
               type="text"
               name="service_name"
               placeholder="Service Name"
-              className="input input-bordered w-full"
+              className="input input-bordered"
               required
             />
             <input
               type="number"
               name="cost"
-              placeholder="Cost (BDT)"
-              className="input input-bordered w-full"
+              placeholder="Cost"
+              className="input input-bordered"
               required
             />
             <input
               type="text"
               name="unit"
-              placeholder="Unit (e.g. per floor, sqft)"
-              className="input input-bordered w-full"
+              placeholder="Unit (e.g. sqft)"
+              className="input input-bordered"
               required
             />
             <select
               name="service_category"
-              className="select select-bordered w-full"
+              className="select select-bordered"
               required
             >
               <option value="wedding">Wedding</option>
               <option value="office">Office</option>
               <option value="home">Home</option>
-              <option value="seminar">Seminar</option>
             </select>
             <input
               type="url"
               name="image"
               placeholder="Image URL"
-              className="input input-bordered w-full col-span-1 md:col-span-2"
+              className="input input-bordered md:col-span-2"
               required
             />
             <textarea
               name="description"
               placeholder="Description"
-              className="textarea textarea-bordered w-full col-span-1 md:col-span-2"
-              rows="3"
+              className="textarea textarea-bordered md:col-span-2"
               required
             ></textarea>
-            <div className="modal-action col-span-1 md:col-span-2">
+            <div className="modal-action md:col-span-2">
               <button type="submit" className="btn btn-success text-white">
-                Save Service
+                Save
               </button>
               <button
                 type="button"
@@ -161,45 +160,29 @@ const ManageServices = () => {
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(services) && services.length > 0 ? (
-              services.map((service) => (
-                <tr key={service._id}>
-                  <td>
-                    <img
-                      src={service.image}
-                      className="w-12 h-12 rounded object-cover"
-                      alt=""
-                    />
-                  </td>
-                  <td>
-                    <div className="font-bold">{service.service_name}</div>
-                    <div className="text-xs uppercase opacity-60">
-                      {service.service_category}
-                    </div>
-                  </td>
-                  <td>
-                    {service.cost} BDT / {service.unit}
-                  </td>
-                  <td className="flex gap-2">
-                    <button className="btn btn-info btn-xs text-white">
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteService(service._id)}
-                      className="btn btn-error btn-xs text-white"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="text-center py-4">
-                  No services found.
+            {services.map((service) => (
+              <tr key={service._id}>
+                <td>
+                  <img
+                    src={service.image}
+                    className="w-12 h-12 rounded object-cover"
+                    alt=""
+                  />
+                </td>
+                <td>
+                  <div className="font-bold">{service.service_name}</div>
+                </td>
+                <td>{service.cost} BDT</td>
+                <td className="flex gap-2">
+                  <button
+                    onClick={() => handleDeleteService(service._id)}
+                    className="btn btn-error btn-xs text-white"
+                  >
+                    <FaTrash />
+                  </button>
                 </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
