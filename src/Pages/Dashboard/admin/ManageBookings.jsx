@@ -1,121 +1,173 @@
 import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import LoadingSpinner from "../../../Shared/LoadingSpinner";
-import toast from "react-hot-toast";
-import { FaTasks, FaUserCheck } from "react-icons/fa";
+import { FaUserEdit, FaCheckCircle, FaHourglassHalf } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const ManageBookings = () => {
   const axiosSecure = useAxiosSecure();
 
   const {
     data: bookings = [],
-    isLoading: bLoading,
+    isLoading: isBookingsLoading,
     refetch,
   } = useQuery({
-    queryKey: ["allBookings"],
+    queryKey: ["manage-all-bookings"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/bookings/all");
+      const res = await axiosSecure.get("/bookings");
       return res.data;
     },
   });
 
   const { data: decorators = [] } = useQuery({
-    queryKey: ["allDecorators"],
+    queryKey: ["all-decorators"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/users");
-      return res.data.filter((user) => user.role === "decorator");
+      const res = await axiosSecure.get("/decorators");
+      return res.data;
     },
   });
 
-  const handleAssign = async (bookingId, decorator) => {
+  const handleAssignDecorator = async (bookingId, decorator) => {
+    if (!decorator) return;
+
     try {
       const res = await axiosSecure.patch(
         `/bookings/assign-decorator/${bookingId}`,
         {
           decoratorEmail: decorator.email,
-          decoratorName: decorator.displayName || decorator.name,
+          decoratorName: decorator.name,
         }
       );
+
       if (res.data.modifiedCount > 0) {
-        toast.success("Decorator Assigned Successfully!");
         refetch();
+        Swal.fire({
+          icon: "success",
+          title: "Decorator Assigned!",
+          text: `Project assigned to ${decorator.name}`,
+          timer: 1500,
+          showConfirmButton: false,
+        });
       }
     } catch (error) {
-      toast.error("Assignment Failed!");
+      Swal.fire("Error", "Could not assign decorator", "error");
     }
   };
 
-  if (bLoading) return <LoadingSpinner />;
+  if (isBookingsLoading) return <LoadingSpinner />;
 
   return (
-    <div className="p-8">
-      <h2 className="text-3xl font-bold mb-8 flex items-center gap-2">
-        <FaTasks /> Manage All Bookings
-      </h2>
-      <div className="overflow-x-auto bg-white rounded-lg shadow-xl">
+    <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-3xl font-black text-secondary flex items-center gap-2">
+          <FaUserEdit /> Manage All Bookings ({bookings.length})
+        </h2>
+      </div>
+
+      <div className="overflow-x-auto bg-white rounded-3xl shadow-xl border">
         <table className="table w-full">
-          <thead>
-            <tr className="bg-gray-100">
-              <th>Service</th>
-              <th>Customer</th>
+          <thead className="bg-secondary text-white">
+            <tr className="text-center">
+              <th>#</th>
+              <th>Service & User</th>
+              <th>Price</th>
               <th>Payment</th>
-              <th>Assign Decorator</th>
               <th>Status</th>
+              <th>Assign Decorator</th>
             </tr>
           </thead>
           <tbody>
-            {bookings.map((booking) => (
-              <tr key={booking._id}>
-                <td>{booking.serviceName}</td>
-                <td>{booking.userEmail}</td>
-                <td>
-                  <span
-                    className={`badge ${
-                      booking.paymentStatus === "paid"
-                        ? "badge-success"
-                        : "badge-error text-white"
-                    }`}
-                  >
-                    {booking.paymentStatus || "unpaid"}
-                  </span>
+            {bookings.map((booking, index) => (
+              <tr
+                key={booking._id}
+                className="hover:bg-gray-50 text-center border-b"
+              >
+                <th>{index + 1}</th>
+                <td className="text-left">
+                  <div className="font-bold text-primary">
+                    {booking.serviceName}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {booking.userEmail}
+                  </div>
                 </td>
+                <td className="font-bold italic">৳{booking.price}</td>
                 <td>
                   {booking.paymentStatus === "paid" ? (
-                    <select
-                      defaultValue={booking.decoratorEmail || ""}
-                      onChange={(e) => {
-                        const selected = decorators.find(
-                          (d) => d.email === e.target.value
-                        );
-                        handleAssign(booking._id, selected);
-                      }}
-                      className="select select-bordered select-xs w-full max-w-xs"
-                    >
-                      <option value="" disabled>
-                        Select Decorator
-                      </option>
-                      {decorators.map((d) => (
-                        <option key={d._id} value={d.email}>
-                          {d.displayName || d.name}
-                        </option>
-                      ))}
-                    </select>
+                    <span className="badge badge-success gap-1 text-white py-3 px-4">
+                      <FaCheckCircle /> Paid
+                    </span>
                   ) : (
-                    <span className="text-xs italic text-gray-400">
-                      Wait for Payment
+                    <span className="badge badge-warning gap-1 py-3 px-4">
+                      <FaHourglassHalf /> Unpaid
                     </span>
                   )}
                 </td>
                 <td>
-                  <span className="badge badge-outline">
-                    {booking.status || "pending"}
+                  <span
+                    className={`capitalize font-semibold ${
+                      booking.status === "completed"
+                        ? "text-success"
+                        : booking.status === "assigned"
+                        ? "text-info"
+                        : "text-orange-400"
+                    }`}
+                  >
+                    {booking.status || "Pending"}
                   </span>
+                </td>
+                <td>
+                  <div className="form-control w-full max-w-xs mx-auto">
+                    {booking.decoratorEmail ? (
+                      <div className="text-xs">
+                        <p className="font-bold text-gray-700">
+                          {booking.decoratorName}
+                        </p>
+                        <button
+                          onClick={() =>
+                            handleAssignDecorator(booking._id, null)
+                          }
+                          className="text-primary hover:underline"
+                        >
+                          Change
+                        </button>
+                      </div>
+                    ) : (
+                      <select
+                        onChange={(e) => {
+                          const decorator = decorators.find(
+                            (d) => d.email === e.target.value
+                          );
+                          handleAssignDecorator(booking._id, decorator);
+                        }}
+                        className="select select-bordered select-sm w-full focus:ring-2 focus:ring-primary"
+                        defaultValue=""
+                      >
+                        <option value="" disabled>
+                          Select Decorator
+                        </option>
+                        {decorators.map((dec) => (
+                          <option key={dec._id} value={dec.email}>
+                            {dec.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {bookings.length === 0 && (
+        <div className="text-center py-20">
+          <p className="text-xl text-gray-400">
+            No bookings found in the database.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

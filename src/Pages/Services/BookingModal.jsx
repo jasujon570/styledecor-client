@@ -20,48 +20,47 @@ const BookingModal = ({ isOpen, onClose, service, user }) => {
   const onSubmit = (data) => {
     const toastId = toast.loading("Creating your booking...");
 
+    const bookingData = {
+      serviceId: service._id || service.id,
+      serviceName: service.service_name,
+      price: service.cost,
+      unit: service.unit,
+      bookingDate: data.bookingDate,
+      location: data.location,
+      userEmail: user?.email,
+      userName: user?.displayName,
+      paymentStatus: "unpaid",
+      status: "pending",
+    };
+
     axiosSecure
-      .post("/bookings", {
-        serviceId: service.id,
-        serviceName: service.service_name,
-        cost: service.cost,
-        bookingDate: data.bookingDate,
-        location: data.location,
-      })
+      .post("/bookings", bookingData)
       .then((res) => {
-        const bookingId = res?.data?.bookingId;
-        if (!bookingId) {
-          throw new Error("Booking created but no bookingId returned.");
-        }
+        const bookingId = res?.data?.insertedId || res?.data?.bookingId;
 
-        toast.success("Booking created! Redirecting to payment...", {
-          id: toastId,
-        });
+        if (res.data) {
+          toast.success("Booking created! Redirecting to payment...", {
+            id: toastId,
+          });
 
-        onClose();
-        reset();
+          onClose();
+          reset();
 
-        navigate("/payment", {
-          state: {
-            booking: {
-              _id: bookingId,
-              serviceId: service.id,
-              serviceName: service.service_name,
-              cost: service.cost,
-              unit: service.unit,
-              bookingDate: data.bookingDate,
-              location: data.location,
+          navigate(`/dashboard/payment/${bookingId}`, {
+            state: {
+              booking: {
+                _id: bookingId,
+                ...bookingData,
+              },
             },
-          },
-        });
+          });
+        }
       })
       .catch((error) => {
         console.error("Create Booking Error:", error);
         const apiMessage =
-          error?.response?.data?.message ||
-          error?.response?.data?.error ||
-          error?.message;
-        toast.error(apiMessage || "Failed to create booking.", { id: toastId });
+          error?.response?.data?.message || "Failed to create booking.";
+        toast.error(apiMessage, { id: toastId });
       });
   };
 
