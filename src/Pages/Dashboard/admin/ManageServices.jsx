@@ -3,9 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "../../../Shared/LoadingSpinner";
 import { FaEdit, FaTrash, FaPlusCircle, FaTools } from "react-icons/fa";
 import toast from "react-hot-toast";
+import useAuth from "../../../hooks/useAuth";
 
 const ManageServices = () => {
   const axiosSecure = useAxiosSecure();
+  const { user } = useAuth();
 
   const {
     data: services = [],
@@ -19,53 +21,140 @@ const ManageServices = () => {
     },
   });
 
-  const handleDeleteService = async (service) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete the service: ${service.service_name}?`
-      )
-    ) {
-      return;
-    }
+  const handleAddService = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const newService = {
+      service_name: form.service_name.value,
+      cost: parseFloat(form.cost.value),
+      unit: form.unit.value,
+      service_category: form.service_category.value,
+      description: form.description.value,
+      image: form.image.value,
+      createdByEmail: user?.email,
+    };
 
     try {
-      const res = await axiosSecure.delete(`/services/${service._id}`);
-
-      if (res.data.deletedCount > 0) {
-        toast.success(`${service.service_name} deleted successfully.`);
+      const res = await axiosSecure.post("/services", newService);
+      if (res.data.insertedId) {
+        toast.success("New Service Added!");
+        form.reset();
+        document.getElementById("add_service_modal").close();
         refetch();
-      } else {
-        toast.error("Failed to delete service.");
       }
     } catch (error) {
-      console.error("Delete error:", error);
-      toast.error("Could not delete service.");
+      toast.error("Failed to add service.");
     }
   };
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
+  const handleDeleteService = async (id) => {
+    if (!window.confirm("Are you sure?")) return;
+    try {
+      const res = await axiosSecure.delete(`/services/${id}`);
+      if (res.data.deletedCount > 0) {
+        toast.success("Service deleted.");
+        refetch();
+      }
+    } catch (error) {
+      toast.error("Failed to delete.");
+    }
+  };
+
+  if (isLoading) return <LoadingSpinner />;
 
   return (
     <section className="p-4 md:p-8">
-      <h2 className="text-3xl font-bold text-error mb-8 flex items-center gap-2">
-        <FaTools /> Manage Decoration Services ({services.length})
-      </h2>
-
-      <div className="flex justify-end mb-4">
-        <button className="btn btn-primary">
-          <FaPlusCircle /> Add New Service (Modal/Form Placeholder)
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-3xl font-bold text-error flex items-center gap-2">
+          <FaTools /> Manage Services ({services.length})
+        </h2>
+        <button
+          className="btn btn-primary"
+          onClick={() =>
+            document.getElementById("add_service_modal").showModal()
+          }
+        >
+          <FaPlusCircle /> Add Service
         </button>
       </div>
 
+      
+      <dialog id="add_service_modal" className="modal">
+        <div className="modal-box w-11/12 max-w-2xl">
+          <h3 className="font-bold text-lg mb-4">Add New Decoration Service</h3>
+          <form
+            onSubmit={handleAddService}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            <input
+              type="text"
+              name="service_name"
+              placeholder="Service Name"
+              className="input input-bordered w-full"
+              required
+            />
+            <input
+              type="number"
+              name="cost"
+              placeholder="Cost (BDT)"
+              className="input input-bordered w-full"
+              required
+            />
+            <input
+              type="text"
+              name="unit"
+              placeholder="Unit (e.g. per floor, sqft)"
+              className="input input-bordered w-full"
+              required
+            />
+            <select
+              name="service_category"
+              className="select select-bordered w-full"
+              required
+            >
+              <option value="wedding">Wedding</option>
+              <option value="office">Office</option>
+              <option value="home">Home</option>
+              <option value="seminar">Seminar</option>
+            </select>
+            <input
+              type="url"
+              name="image"
+              placeholder="Image URL"
+              className="input input-bordered w-full col-span-1 md:col-span-2"
+              required
+            />
+            <textarea
+              name="description"
+              placeholder="Description"
+              className="textarea textarea-bordered w-full col-span-1 md:col-span-2"
+              rows="3"
+              required
+            ></textarea>
+            <div className="modal-action col-span-1 md:col-span-2">
+              <button type="submit" className="btn btn-success text-white">
+                Save Service
+              </button>
+              <button
+                type="button"
+                className="btn"
+                onClick={() =>
+                  document.getElementById("add_service_modal").close()
+                }
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </dialog>
+
       <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
         <table className="table w-full">
-          <thead className="bg-base-200">
+          <thead>
             <tr>
               <th>Image</th>
-              <th>Name</th>
-              <th>Category</th>
+              <th>Details</th>
               <th>Cost</th>
               <th>Actions</th>
             </tr>
@@ -74,26 +163,30 @@ const ManageServices = () => {
             {services.map((service) => (
               <tr key={service._id}>
                 <td>
-                  <div className="avatar">
-                    <div className="mask mask-squircle w-12 h-12">
-                      <img src={service.image} alt={service.service_name} />
-                    </div>
+                  <img
+                    src={service.image}
+                    className="w-12 h-12 rounded object-cover"
+                    alt=""
+                  />
+                </td>
+                <td>
+                  <div className="font-bold">{service.service_name}</div>
+                  <div className="text-xs uppercase opacity-60">
+                    {service.service_category}
                   </div>
                 </td>
-                <td className="font-semibold">{service.service_name}</td>
-                <td>{service.service_category.toUpperCase()}</td>
                 <td>
-                  {service.cost.toLocaleString()} BDT / {service.unit}
+                  {service.cost} BDT / {service.unit}
                 </td>
-                <td>
-                  <button className="btn btn-info btn-xs text-white mr-2">
-                    <FaEdit /> Edit
+                <td className="flex gap-2">
+                  <button className="btn btn-info btn-xs text-white">
+                    <FaEdit />
                   </button>
                   <button
-                    onClick={() => handleDeleteService(service)}
+                    onClick={() => handleDeleteService(service._id)}
                     className="btn btn-error btn-xs text-white"
                   >
-                    <FaTrash /> Delete
+                    <FaTrash />
                   </button>
                 </td>
               </tr>
@@ -101,12 +194,6 @@ const ManageServices = () => {
           </tbody>
         </table>
       </div>
-
-      {services.length === 0 && (
-        <p className="text-center mt-12 text-xl text-gray-500">
-          No services available to manage.
-        </p>
-      )}
     </section>
   );
 };
