@@ -1,16 +1,18 @@
 import { Navigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import useRole from "../hooks/useRole";
 import LoadingSpinner from "../Shared/LoadingSpinner.jsx";
 
 const DecoratorRoute = ({ children }) => {
-  const { user, loading, userRole } = useAuth();
+  const { user, loading } = useAuth();
+  const [role, isRoleLoading] = useRole();
   const location = useLocation();
 
-  if (loading || (user && !userRole)) {
+  if (loading || isRoleLoading) {
     return <LoadingSpinner />;
   }
 
-  if (user && userRole === "decorator") {
+  if (user && role === "decorator") {
     return children;
   }
 
@@ -18,4 +20,3 @@ const DecoratorRoute = ({ children }) => {
 };
 
 export default DecoratorRoute;
-

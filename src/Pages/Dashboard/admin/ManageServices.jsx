@@ -17,7 +17,7 @@ const ManageServices = () => {
     queryKey: ["allServicesAdmin"],
     queryFn: async () => {
       const res = await axiosSecure.get("/services");
-      return res.data;
+      return Array.isArray(res.data) ? res.data : res.data.services || [];
     },
   });
 
@@ -50,8 +50,9 @@ const ManageServices = () => {
   const handleDeleteService = async (id) => {
     if (!window.confirm("Are you sure?")) return;
     try {
-      const res = await axiosSecure.delete(`/services/${id}`);
-      if (res.data.deletedCount > 0) {
+      const res = await axiosSecure.get(`/services/${id}`);
+      const deleteRes = await axiosSecure.delete(`/services/${id}`);
+      if (deleteRes.data.deletedCount > 0) {
         toast.success("Service deleted.");
         refetch();
       }
@@ -66,7 +67,8 @@ const ManageServices = () => {
     <section className="p-4 md:p-8">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-bold text-error flex items-center gap-2">
-          <FaTools /> Manage Services ({services.length})
+          <FaTools /> Manage Services (
+          {Array.isArray(services) ? services.length : 0})
         </h2>
         <button
           className="btn btn-primary"
@@ -78,7 +80,6 @@ const ManageServices = () => {
         </button>
       </div>
 
-      
       <dialog id="add_service_modal" className="modal">
         <div className="modal-box w-11/12 max-w-2xl">
           <h3 className="font-bold text-lg mb-4">Add New Decoration Service</h3>
@@ -160,37 +161,45 @@ const ManageServices = () => {
             </tr>
           </thead>
           <tbody>
-            {services.map((service) => (
-              <tr key={service._id}>
-                <td>
-                  <img
-                    src={service.image}
-                    className="w-12 h-12 rounded object-cover"
-                    alt=""
-                  />
-                </td>
-                <td>
-                  <div className="font-bold">{service.service_name}</div>
-                  <div className="text-xs uppercase opacity-60">
-                    {service.service_category}
-                  </div>
-                </td>
-                <td>
-                  {service.cost} BDT / {service.unit}
-                </td>
-                <td className="flex gap-2">
-                  <button className="btn btn-info btn-xs text-white">
-                    <FaEdit />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteService(service._id)}
-                    className="btn btn-error btn-xs text-white"
-                  >
-                    <FaTrash />
-                  </button>
+            {Array.isArray(services) && services.length > 0 ? (
+              services.map((service) => (
+                <tr key={service._id}>
+                  <td>
+                    <img
+                      src={service.image}
+                      className="w-12 h-12 rounded object-cover"
+                      alt=""
+                    />
+                  </td>
+                  <td>
+                    <div className="font-bold">{service.service_name}</div>
+                    <div className="text-xs uppercase opacity-60">
+                      {service.service_category}
+                    </div>
+                  </td>
+                  <td>
+                    {service.cost} BDT / {service.unit}
+                  </td>
+                  <td className="flex gap-2">
+                    <button className="btn btn-info btn-xs text-white">
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteService(service._id)}
+                      className="btn btn-error btn-xs text-white"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="text-center py-4">
+                  No services found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Main from "../Layout/Main.jsx";
-import DashboardLayout from "../layout/DashboardLayout.jsx";
+import DashboardLayout from "../Layout/DashboardLayout.jsx";
 import ProtectedRoutes from "./ProtectedRoutes.jsx";
 import AdminRoute from "./AdminRoute.jsx";
 import DecoratorRoute from "./DecoratorRoute.jsx";

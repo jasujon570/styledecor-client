@@ -1,16 +1,18 @@
 import { Navigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import useRole from "../hooks/useRole";
 import LoadingSpinner from "../Shared/LoadingSpinner.jsx";
 
 const AdminRoute = ({ children }) => {
-  const { user, loading, userRole } = useAuth();
+  const { user, loading } = useAuth();
+  const [role, isRoleLoading] = useRole();
   const location = useLocation();
 
-  if (loading || (user && !userRole)) {
+  if (loading || isRoleLoading) {
     return <LoadingSpinner />;
   }
 
-  if (user && userRole === "admin") {
+  if (user && role === "admin") {
     return children;
   }
 
