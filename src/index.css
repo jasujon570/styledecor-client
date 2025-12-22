@@ -1,19 +1,5 @@
-@import "leaflet/dist/leaflet.css";
+@import 'leaflet/dist/leaflet.css';
 @import "tailwindcss";
-
-@theme {
-  --color-primary: #0d9488;
-  --color-secondary: #1e293b;
-  --color-accent: #f59e0b;
-}
-
-@plugin "daisyui";
-
-:root {
-  --p: var(--color-primary);
-  --s: var(--color-secondary);
-  --a: var(--color-accent);
-
-  --n: #0f172a;
-  --b1: #ffffff;
+@plugin "daisyui" {
+  themes: corporate --default, dim --prefersdark;
 }

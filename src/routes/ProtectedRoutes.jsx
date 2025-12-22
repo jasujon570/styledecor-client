@@ -2,19 +2,19 @@ import { Navigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import LoadingSpinner from "../Shared/LoadingSpinner.jsx";
 
-const AdminRoute = ({ children }) => {
-  const { user, loading, userRole } = useAuth();
+const ProtectedRoutes = ({ children }) => {
+  const { user, loading } = useAuth();
   const location = useLocation();
 
-  if (loading || (user && !userRole)) {
+  if (loading) {
     return <LoadingSpinner />;
   }
 
-  if (user && userRole === "admin") {
+  if (user) {
     return children;
   }
 
-  return <Navigate to="/" state={{ from: location }} replace />;
+  return <Navigate to="/login" state={{ from: location }} replace />;
 };
 
-export default AdminRoute;
+export default ProtectedRoutes;

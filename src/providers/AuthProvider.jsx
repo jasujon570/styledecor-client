@@ -1,24 +1,29 @@
-import { createContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { AuthContext } from "./AuthContext";
+import axios from "axios";
 import {
-  GoogleAuthProvider,
   createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signOut,
   updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
-import { app } from "../firebase/firebase.config";
-import axios from "axios";
+import app from "../firebase/firebase.config";
 
-export const AuthContext = createContext(null);
 const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+const API_BASE_URL =
+  import.meta.env.VITE_SERVER_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000/api";
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const googleProvider = new GoogleAuthProvider();
+  const [userRole, setUserRole] = useState(null);
 
   const createUser = (email, password) => {
     setLoading(true);
@@ -37,6 +42,8 @@ const AuthProvider = ({ children }) => {
 
   const logOut = () => {
     setLoading(true);
+    setUserRole(null);
+    localStorage.removeItem("access-token");
     return signOut(auth);
   };
 
@@ -51,25 +58,32 @@ const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        // Get token and store in client
-        const userInfo = { email: currentUser.email };
-        axios.post("http://localhost:5000/jwt", userInfo).then((res) => {
-          if (res.data.token) {
-            localStorage.setItem("access-token", res.data.token);
-            setLoading(false);
-          }
-        });
+        if (currentUser.email === "admin@test.com") {
+          setUserRole("admin");
+        } else if (currentUser.email === "decorator@test.com") {
+          setUserRole("decorator");
+        } else {
+          setUserRole("user");
+        }
 
-        // Save user info to database
-        const dbUser = {
-          name: currentUser.displayName,
-          email: currentUser.email,
-          photo: currentUser.photoURL,
-        };
         axios
-          .post("http://localhost:5000/users", dbUser)
-          .then((res) => console.log("User synced with DB"));
+          .post(`${API_BASE_URL}/auth/jwt`, {
+            email: currentUser.email,
+            displayName: currentUser.displayName,
+            photoURL: currentUser.photoURL,
+          })
+          .then((res) => {
+            if (res?.data?.token) {
+              localStorage.setItem("access-token", res.data.token);
+            }
+          })
+          .catch((err) => {
+            console.error("Failed to issue JWT:", err);
+            localStorage.removeItem("access-token");
+          })
+          .finally(() => setLoading(false));
       } else {
+        setUserRole(null);
         localStorage.removeItem("access-token");
         setLoading(false);
       }
@@ -80,6 +94,7 @@ const AuthProvider = ({ children }) => {
   const authInfo = {
     user,
     loading,
+    userRole,
     createUser,
     signIn,
     googleSignIn,

@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "service_name": "Luxury Wedding Package",
+    "cost": 50000,
+    "unit": "per event",
+    "service_category": "wedding",
+    "description": "Premium setup with exotic floral arrangements and customized lighting.",
+    "image": "https://i.ibb.co.com/Jj6MZQ2X/images.jpg"
+  },
+  {
+    "id": 2,
+    "service_name": "Modern Home Interior",
+    "cost": 1500,
+    "unit": "per sq-ft",
+    "service_category": "home",
+    "description": "Sleek, minimal design for living rooms and bedrooms.",
+    "image": "https://i.ibb.co.com/Y7q8cLMw/2.jpg"
+  },
+  {
+    "id": 3,
+    "service_name": "Corporate Seminar Setup",
+    "cost": 30000,
+    "unit": "per seminar",
+    "service_category": "office",
+    "description": "Professional stage and seating arrangements with audiovisual support.",
+    "image": "https://i.ibb.co.com/WpDwXSGM/3.jpg"
+  },
+  {
+    "id": 4,
+    "service_name": "Birthday Party Decoration",
+    "cost": 8000,
+    "unit": "per party",
+    "service_category": "ceremony",
+    "description": "Fun and colorful themes for all ages, including balloon artistry.",
+    "image": "https://i.ibb.co.com/d0vG3L6r/4.jpg"
+  }
+]
