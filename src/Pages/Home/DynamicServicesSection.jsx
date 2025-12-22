@@ -10,7 +10,7 @@ const DynamicServicesSection = () => {
   useEffect(() => {
   
     axios
-      .get("http://localhost:5000/api/services")
+      .get("https://styledecor-server-psi.vercel.app/services")
       .then((res) => {
         setServices(res.data.slice(0, 4));
         setLoading(false);
