@@ -1,16 +1,15 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const MainLayout = () => {
   return (
-    <div className="max-w-screen-2xl mx-auto">
+    <div className="font-lato">
       <Navbar />
-      <div className="min-h-[calc(100vh-250px)]">
+      <div className="min-h-[calc(100vh-400px)]">
         <Outlet />
       </div>
-      <div className="p-10 bg-secondary text-white text-center mt-10">
-        Footer
-      </div>
+      <Footer />
     </div>
   );
 };
