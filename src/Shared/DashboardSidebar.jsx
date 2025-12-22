@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import useRole from "../hooks/useRole";
+import LoadingSpinner from "../Shared/LoadingSpinner";
 import {
   FaUser,
   FaListUl,
@@ -12,7 +13,20 @@ import {
 } from "react-icons/fa";
 
 const DashboardSidebar = () => {
-  const [role] = useRole();
+
+  const [role, isRoleLoading] = useRole();
+
+  
+  if (isRoleLoading) {
+    return (
+      <div className="p-4 bg-gray-100 h-full">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+ 
+  const currentRole = role?.toLowerCase();
 
   return (
     <div className="flex flex-col h-full p-4 bg-gray-100 text-gray-800">
@@ -21,6 +35,7 @@ const DashboardSidebar = () => {
       </h2>
 
       <div className="flex-1 space-y-2 text-sm font-semibold">
+   
         <NavLink
           to="/dashboard/profile"
           className={({ isActive }) =>
@@ -32,8 +47,9 @@ const DashboardSidebar = () => {
           <FaUser className="mr-2" /> My Profile
         </NavLink>
 
-        {role === "admin" && (
-          <div className="mt-6 border-t pt-4">
+   
+        {currentRole === "admin" && (
+          <div className="mt-6 border-t pt-4 animate-fadeIn">
             <p className="text-xs uppercase text-gray-500 mb-2 px-2">
               Admin Panel
             </p>
@@ -80,8 +96,9 @@ const DashboardSidebar = () => {
           </div>
         )}
 
-        {role === "decorator" && (
-          <div className="mt-6 border-t pt-4">
+        
+        {currentRole === "decorator" && (
+          <div className="mt-6 border-t pt-4 animate-fadeIn">
             <p className="text-xs uppercase text-gray-500 mb-2 px-2">
               Decorator Panel
             </p>
@@ -108,8 +125,9 @@ const DashboardSidebar = () => {
           </div>
         )}
 
-        {role === "user" && (
-          <>
+        
+        {currentRole === "user" && (
+          <div className="mt-4">
             <NavLink
               to="/dashboard/my-bookings"
               className={({ isActive }) =>
@@ -130,14 +148,14 @@ const DashboardSidebar = () => {
             >
               <FaHistory className="mr-2" /> Payment History
             </NavLink>
-          </>
+          </div>
         )}
       </div>
 
       <div className="border-t pt-4">
         <NavLink
           to="/"
-          className="flex items-center p-2 hover:bg-gray-200 rounded-lg"
+          className="flex items-center p-2 hover:bg-gray-200 rounded-lg text-primary font-bold"
         >
           <FaHome className="mr-2" /> Back to Home
         </NavLink>

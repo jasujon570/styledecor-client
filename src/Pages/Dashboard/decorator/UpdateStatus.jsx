@@ -1,88 +1,73 @@
-const UpdateStatus = () => {
-  const projects = [
-    {
-      id: "P001",
-      service: "Wedding Bliss",
-      client: "Mr. A",
-      status: "Pending",
-    },
-    {
-      id: "P002",
-      service: "Home Makeover",
-      client: "Ms. B",
-      status: "In Progress",
-    },
-    {
-      id: "P003",
-      service: "Office Setup",
-      client: "Tech Corp",
-      status: "Completed",
-    },
-  ];
+import useAuth from "../../../hooks/useAuth";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
-  const handleStatusChange = (projectId, newStatus) => {
-    console.log(`Updating project ${projectId} to status: ${newStatus}`);
-    alert(`Status for ${projectId} updated to ${newStatus}`);
+const UpdateStatus = () => {
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
+
+  const { data: projects = [], refetch } = useQuery({
+    queryKey: ["update-status", user?.email],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `/bookings/assigned-projects/${user.email}`
+      );
+      return res.data;
+    },
+  });
+
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const res = await axiosSecure.patch(`/bookings/update-status/${id}`, {
+        status: newStatus,
+      });
+      if (res.data.modifiedCount > 0) {
+        toast.success("Status Updated!");
+        refetch();
+      }
+    } catch (err) {
+      toast.error("Failed!");
+    }
   };
 
   return (
-    <div className="p-6">
+    <div className="p-8">
       <h1 className="text-3xl font-bold text-secondary mb-8">
-        Update Project Status 🔄
+        Update Status 🔄
       </h1>
-      <p className="text-gray-600 mb-6">
-        Manage and update the progress status of your currently assigned
-        projects.
-      </p>
-
-      <div className="overflow-x-auto bg-white rounded-lg shadow-md">
-        <table className="table w-full">
-          <thead>
-            <tr className="bg-base-200">
-              <th>Project ID</th>
-              <th>Service</th>
-              <th>Client</th>
-              <th>Current Status</th>
-              <th>Action</th>
+      <table className="table w-full bg-white shadow rounded-lg">
+        <thead className="bg-gray-200">
+          <tr>
+            <th>Service</th>
+            <th>Client</th>
+            <th>Current Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {projects.map((p) => (
+            <tr key={p._id}>
+              <td>{p.serviceName}</td>
+              <td>{p.userEmail}</td>
+              <td>
+                <span className="badge badge-info">{p.status}</span>
+              </td>
+              <td>
+                <select
+                  className="select select-sm select-bordered"
+                  onChange={(e) => handleStatusChange(p._id, e.target.value)}
+                  defaultValue={p.status}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {projects.map((project) => (
-              <tr key={project.id}>
-                <td className="font-mono">{project.id}</td>
-                <td>{project.service}</td>
-                <td>{project.client}</td>
-                <td>
-                  <span
-                    className={`badge ${
-                      project.status === "Completed"
-                        ? "badge-success"
-                        : project.status === "In Progress"
-                        ? "badge-info"
-                        : "badge-warning"
-                    }`}
-                  >
-                    {project.status}
-                  </span>
-                </td>
-                <td>
-                  <select
-                    className="select select-sm select-bordered"
-                    defaultValue={project.status}
-                    onChange={(e) =>
-                      handleStatusChange(project.id, e.target.value)
-                    }
-                  >
-                    <option>Pending</option>
-                    <option>In Progress</option>
-                    <option>Completed</option>
-                  </select>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
