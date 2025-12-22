@@ -1,129 +1,90 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import MapSection from "../components/MapSection";
+import Banner from "../components/Banner";
 import ServiceCard from "../components/ServiceCard";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Home = () => {
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const [services, setServices] = useState([]);
 
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/services");
-        setServices(response.data.slice(0, 6));
-        setError(null);
-      } catch (err) {
-        console.error("Fetch error:", err);
-        setError("Failed to fetch services. Please ensure backend is running.");
-      } finally {
-        setLoading(false);
-      }
-    };
+    useEffect(() => {
+        // হোমে মাত্র ৬টি সার্ভিস দেখানোর জন্য স্লাইস করা যেতে পারে
+        axios.get('http://localhost:5000/services')
+            .then(res => {
+                setServices(res.data.slice(0, 6)); 
+            });
+    }, []);
 
-    fetchServices();
-  }, []);
+    return (
+        <div>
+            {/* ১. ব্যানার সেকশন */}
+            <Banner />
 
-  return (
-    <div className="overflow-x-hidden">
-      <section className="relative min-h-[80vh] flex items-center justify-center bg-secondary overflow-hidden">
-        <div className="absolute -top-20 -left-20 w-72 h-72 bg-primary/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl"></div>
+            {/* ২. পপুলার সার্ভিস সেকশন */}
+            <section className="container mx-auto px-4 md:px-8 py-20">
+                <div className="text-center mb-12">
+                    <h2 className="text-4xl font-bold text-secondary mb-4">Our Popular Services</h2>
+                    <p className="text-gray-500 max-w-2xl mx-auto">Explore our top-rated decoration services designed to make your moments unforgettable.</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {services.map(service => (
+                        <ServiceCard key={service._id} service={service} />
+                    ))}
+                </div>
 
-        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center relative z-10 py-20">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="md:w-1/2 text-white"
-          >
-            <h1 className="text-5xl md:text-7xl font-extrabold leading-tight">
-              Elevate Your <span className="text-primary italic">Events</span>{" "}
-              <br />
-              with StyleDecor
-            </h1>
-            <p className="mt-6 text-lg text-gray-300 max-w-lg">
-              Premium home and ceremony decoration services tailored to your
-              unique taste.
-            </p>
-            <div className="mt-10">
-              <Link
-                to="/services"
-                className="btn btn-primary px-8 rounded-full text-lg shadow-lg"
-              >
-                Book Decoration Service
-              </Link>
-            </div>
-          </motion.div>
+                <div className="text-center mt-12">
+                    <Link to="/services" className="btn btn-primary btn-outline rounded-full px-10">
+                        Show All Services
+                    </Link>
+                </div>
+            </section>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="md:w-1/2 mt-12 md:mt-0 relative"
-          >
-            <div className="relative z-10 rounded-2xl overflow-hidden border-8 border-white/10 shadow-2xl">
-              <img
-                src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=2070&auto=format&fit=crop"
-                alt="Decoration"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </motion.div>
+            {/* ৩. স্ট্যাটস সেকশন (প্রজেক্ট ইমপ্যাক্ট) */}
+            <section className="bg-secondary py-16 text-white mb-20">
+                <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                    <div>
+                        <h3 className="text-4xl font-bold">500+</h3>
+                        <p className="text-gray-300">Events Managed</p>
+                    </div>
+                    <div>
+                        <h3 className="text-4xl font-bold">120+</h3>
+                        <p className="text-gray-300">Expert Designers</p>
+                    </div>
+                    <div>
+                        <h3 className="text-4xl font-bold">1500+</h3>
+                        <p className="text-gray-300">Happy Clients</p>
+                    </div>
+                    <div>
+                        <h3 className="text-4xl font-bold">4.9/5</h3>
+                        <p className="text-gray-300">Client Ratings</p>
+                    </div>
+                </div>
+            </section>
+
+            {/* ৪. FAQ সেকশন (DaisyUI Accordion) */}
+            <section className="container mx-auto px-4 md:px-8 pb-20">
+                <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+                <div className="max-w-3xl mx-auto space-y-4">
+                    <div className="collapse collapse-plus bg-base-200">
+                        <input type="radio" name="my-accordion-3" defaultChecked /> 
+                        <div className="collapse-title text-xl font-medium">How do I book a service?</div>
+                        <div className="collapse-content"> 
+                            <p>Simply browse our services, click on View Details, and if you are logged in, you can click "Book Now" to select your preferred date.</p>
+                        </div>
+                    </div>
+                    <div className="collapse collapse-plus bg-base-200">
+                        <input type="radio" name="my-accordion-3" /> 
+                        <div className="collapse-title text-xl font-medium">Can I cancel my booking?</div>
+                        <div className="collapse-content"> 
+                            <p>Yes, you can manage and cancel your bookings from the "My Bookings" section in your profile.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-      </section>
-
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-secondary">
-              Our Popular Services
-            </h2>
-            <div className="w-24 h-1 bg-primary mx-auto mt-4"></div>
-          </div>
-
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <span className="loading loading-spinner loading-lg text-primary"></span>
-              <p className="mt-4 text-gray-500 italic">Loading services...</p>
-            </div>
-          ) : error ? (
-            <div className="text-center py-20">
-              <p className="text-red-500 font-semibold">{error}</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="btn btn-outline btn-sm mt-4"
-              >
-                Try Again
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {services.map((service) => (
-                <ServiceCard key={service._id} service={service} />
-              ))}
-            </div>
-          )}
-
-          {!loading && !error && (
-            <div className="text-center mt-16">
-              <Link
-                to="/services"
-                className="btn btn-secondary px-10 rounded-full"
-              >
-                View All Services
-              </Link>
-            </div>
-          )}
-        </div>
-      </section>
-
-      <MapSection />
-    </div>
-  );
+    );
 };
 
 export default Home;
